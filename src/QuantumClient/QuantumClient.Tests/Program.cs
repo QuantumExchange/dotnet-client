@@ -7,7 +7,7 @@ namespace QuantumClient.Tests
     {
         static void Main(string[] args)
         {
-            var client = new Client("https//api.quantumtrade.co", "apikey", "secret");
+            var client = new Client("https//api.quantum.exchange", "apikey", "secret");
             
             var orderBook = client.GetOrderBook("btc","cad");
 

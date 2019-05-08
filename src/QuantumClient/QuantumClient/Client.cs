@@ -9,7 +9,7 @@ namespace Quantum
     public class Client
     {
 
-        string serverUrl = "http://api.quantumtrade.co";
+        string serverUrl = "http://api.quantum.exchange";
         string key;
         string secret;
 
