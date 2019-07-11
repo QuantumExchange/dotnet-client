@@ -30,29 +30,17 @@ namespace Quantum
         public  decimal balance;
     }
 
-    public class PlaceMarketOrderRequest {
-        public string action;
-        public decimal amount;
-        public string asset;
-        public string currency;
-        
-    }
-
-    public class PlaceMarketOrderResponse{
-        public string id;
-    }
-
-    public class PlaceLimitOrderRequest
+    public class PlaceOrderRequest
     {
         public string action;
         public decimal amount;
         public string asset;
         public string currency;
         public decimal price;
-
+        public string type;
     }
 
-    public class PlaceLimitOrderResponse
+    public class PlaceOrderResponse
     {
         public string id;
 

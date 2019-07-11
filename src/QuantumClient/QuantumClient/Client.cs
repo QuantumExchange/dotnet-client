@@ -9,7 +9,7 @@ namespace Quantum
     public class Client
     {
 
-        string serverUrl = "http://api.quantum.exchange";
+        string serverUrl = "http://api.quantumtrade.co";
         string key;
         string secret;
 
@@ -111,25 +111,25 @@ namespace Quantum
 
         public string PlaceLimitOrder(string action, decimal amount, string asset, string currency, decimal price)
         {
-            var data = new PlaceLimitOrderRequest() { action = action, amount = amount, asset = asset, currency = currency, price = price };
-            var result = Call(Method.POST, "/v1/create_limit_order", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceLimitOrderResponse>(result.Content);
+            var data = new PlaceOrderRequest() { action = action, amount = amount, asset = asset, currency = currency, price = price, type = "limit" };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
 
             return obj.id;
         }
 
         public string PlaceMarketOrder(string action, decimal amount, string asset, string currency)
         {
-            var data = new PlaceMarketOrderRequest() { action = action, amount = amount, asset = asset, currency = currency };
-            var result = Call(Method.POST, "/v1/create_market_order", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceMarketOrderResponse>(result.Content);
+        var data = new PlaceOrderRequest() { action = action, amount = amount, asset = asset, currency = currency, type = "market" };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
             return obj.id;
         }
 
         public bool CancelOrder(string orderId)
         {
             var data = new CanceOrderRequest() { id = orderId };
-            var result = Call(Method.POST, "/v1/cancel_order", JsonConvert.SerializeObject(data), true);
+            var result = Call(Method.POST, "/v1/order/cancel", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
 
             return obj.success;
@@ -138,7 +138,7 @@ namespace Quantum
         public bool CancelAllOrders(string major, string minor)
         {
             var data = new CancelAllOrdersRequest() { major = major, minor = minor };
-            var result = Call(Method.POST, "/v1/cancel_all_orders", JsonConvert.SerializeObject(data), true);
+            var result = Call(Method.POST, "/v1/order/cancel/all", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
             return obj.success;
         }
