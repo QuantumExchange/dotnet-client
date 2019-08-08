@@ -143,12 +143,11 @@ namespace Quantum
             return obj.success;
         }
 
-        public void WithdrawCrypto() {
-            throw new NotImplementedException();
-        }
-
-        public void WithdrawFiat() {
-            throw new NotImplementedException();
+        public bool SubmitWithdrawal(decimal amount, string asset) {
+            var data = new WithdrawalRequest() { amount = amount, asset = asset };
+            var result = Call(Method.POST, "/v1/withdraw", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<WithdrawalResponse>(result.Content);
+            return obj.success;
         }
 
     }

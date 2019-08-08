@@ -64,5 +64,16 @@ namespace Quantum
         public bool success;
 
     }
-   
+
+    public class WithdrawalRequest
+    {
+        public decimal amount;
+        public string asset;
+    }
+
+    public class WithdrawalResponse
+    {
+        public bool success;
+    }
+
 }
