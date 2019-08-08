@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>Quantum Exchange Corporation</Company>
+    <Authors>Quantum Exchange Corporation</Authors>
+    <RepositoryUrl>https://github.com/QuantumExchange/dotnet-client</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>cryptocurrency trading</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
