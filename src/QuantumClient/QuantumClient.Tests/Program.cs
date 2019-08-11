@@ -11,7 +11,7 @@ namespace QuantumClient.Tests
             
             var orderBook = client.GetOrderBook("btc","cad");
 
-            foreach(var order in orderBook.book)
+            foreach(var order in orderBook.asks)
             {
                 Console.WriteLine("{0} {1} BTC at {2} CAD", order.action, order.amount, order.limit_price);
             }

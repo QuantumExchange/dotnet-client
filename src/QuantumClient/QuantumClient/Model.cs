@@ -21,7 +21,8 @@ namespace Quantum
     {
         public string asset;
         public string currency;
-        public TradeOrder[] book;
+        public TradeOrder[] asks;
+        public TradeOrder[] bids;
         public DateTime timestamp;
     }
 
