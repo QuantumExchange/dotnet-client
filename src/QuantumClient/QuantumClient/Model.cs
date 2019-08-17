@@ -50,6 +50,8 @@ namespace Quantum
     public class CanceOrderRequest
     {
         public string id;
+        public string major;
+        public string minor;
 
     }
 

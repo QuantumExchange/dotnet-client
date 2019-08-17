@@ -7,9 +7,9 @@ namespace QuantumClient.Tests
     {
         static void Main(string[] args)
         {
-            var client = new Client("https//api.quantum.exchange", "apikey", "secret");
+            var client = new Client("https://api.quantum.exchange", "apikey", "secret");
             
-            var orderBook = client.GetOrderBook("btc","cad");
+            var orderBook = client.GetOrderBook("eth","usdt");
 
             foreach(var order in orderBook.asks)
             {
@@ -27,7 +27,7 @@ namespace QuantumClient.Tests
 
             Console.WriteLine("Got order id: {0}", id);
 
-            var success = client.CancelOrder(id);
+            var success = client.CancelOrder(id, "eth", "usdt");
 
             Console.WriteLine("Order cancelled: {0}", success);
 

@@ -126,9 +126,9 @@ namespace Quantum
             return obj.id;
         }
 
-        public bool CancelOrder(string orderId)
+        public bool CancelOrder(string orderId, string major, string minor)
         {
-            var data = new CanceOrderRequest() { id = orderId };
+            var data = new CanceOrderRequest() { id = orderId, major = major, minor = minor };
             var result = Call(Method.POST, "/v1/order/cancel", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
 
