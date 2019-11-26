@@ -13,7 +13,7 @@ namespace QuantumClient.Tests
 
             foreach(var order in orderBook.asks)
             {
-                Console.WriteLine("{0} {1} BTC at {2} CAD", order.action, order.amount, order.limit_price);
+                Console.WriteLine("{0} {1} BTC at {2} CAD", order.action, order.amount, order.price);
             }
 
             var balances = client.GetBalance();

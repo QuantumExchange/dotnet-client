@@ -9,7 +9,7 @@ namespace Quantum
         public decimal filled;
         public string asset;
         public string currency;
-        public decimal limit_price;
+        public decimal price;
         public string status;
         public DateTime created_on;
         public DateTime updated_on;
