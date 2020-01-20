@@ -97,47 +97,144 @@ namespace Quantum
             return JsonConvert.DeserializeObject<Balance[]>(result.Content);
         }
 
-        public TradeOrder[] GetOpenOrders()
+        public OpenOrderItem[] GetOpenOrders(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/orders/open", null, true);
-            return JsonConvert.DeserializeObject<TradeOrder[]>(result.Content);
+            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/open", null, true);
+            return JsonConvert.DeserializeObject<OpenOrderItem[]>(result.Content);
         }
 
-        public TradeOrder GetOrder(string orderId)
+        public StopLossOrderItem[] GetTakeProfitOrders(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/orders/" + orderId, null, true);
-            return JsonConvert.DeserializeObject<TradeOrder>(result.Content);
+            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/take_profit", null, true);
+            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result.Content);
+        }
+
+        public StopLossOrderItem[] GetStopLossOrders(string asset, string currency)
+        {
+            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/stop_loss", null, true);
+            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result.Content);
+        }
+
+        public string PlaceLimitOrder(string action, decimal amount, string asset, string currency, decimal price, string[] options)
+        {
+            var data = new PlaceOrderRequest() { action = action
+                , amount = amount
+                , asset = asset
+                , currency = currency
+                , price = price
+                , type = "limit"
+                , options = options };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+
+            return obj.id;
         }
 
         public string PlaceLimitOrder(string action, decimal amount, string asset, string currency, decimal price)
         {
-            var data = new PlaceOrderRequest() { action = action, amount = amount, asset = asset, currency = currency, price = price, type = "limit" };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
-
-            return obj.id;
+            return PlaceLimitOrder(action, amount, asset, currency, price, new string[] { });
         }
 
         public string PlaceMarketOrder(string action, decimal amount, string asset, string currency)
         {
-        var data = new PlaceOrderRequest() { action = action, amount = amount, asset = asset, currency = currency, type = "market" };
+        var data = new PlaceOrderRequest() { action = action
+            , amount = amount
+            , asset = asset
+            , currency = currency
+            , type = "market" };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
             return obj.id;
         }
 
-        public bool CancelOrder(string orderId, string major, string minor)
+        public string PlaceTakeProfitLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price, string[] options)
         {
-            var data = new CanceOrderRequest() { id = orderId, major = major, minor = minor };
+            var data = new PlaceOrderRequest() { action = action
+                , amount = amount
+                , asset = asset
+                , currency = currency
+                , price = price
+                , stop_price = stop_price
+                , type = "take-profit-limit"
+                , options = options
+            };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+
+            return obj.id;
+        }
+
+        public string PlaceTakeProfitLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
+        {
+            return PlaceTakeProfitLimitOrder(action, amount, asset, currency, price, stop_price, new string[] { });
+        }
+
+        public string PlaceTakeProfitMarketOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
+        {
+            var data = new PlaceOrderRequest() { action = action
+                , amount = amount
+                , asset = asset
+                , currency = currency
+                , price = price
+                , stop_price = stop_price
+                , type = "take-profit-market"
+            };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+
+            return obj.id;
+        }
+
+        public string PlaceStopLossLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price, string[] options)
+        {
+            var data = new PlaceOrderRequest() { action = action
+                , amount = amount
+                , asset = asset
+                , currency = currency
+                , price = price
+                , stop_price = stop_price
+                , type = "stop-loss-limit"
+                , options = options
+            };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+
+            return obj.id;
+        }
+
+        public string PlaceStopLossLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
+        {
+            return PlaceStopLossLimitOrder(action, amount, asset, currency, price, stop_price, new string[] { });
+        }
+
+        public string PlaceStopLossMarketOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
+        {
+            var data = new PlaceOrderRequest() { action = action
+                , amount = amount
+                , asset = asset
+                , currency = currency
+                , price = price
+                , type = "stop-loss-market"
+                , stop_price = stop_price
+            };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+
+            return obj.id;
+        }
+
+        public bool CancelOrder(string orderId, string asset, string currency)
+        {
+            var data = new CanceOrderRequest() { id = orderId, asset = asset, currency = currency };
             var result = Call(Method.POST, "/v1/order/cancel", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
 
             return obj.success;
         }
 
-        public bool CancelAllOrders(string major, string minor)
+        public bool CancelAllOrders(string asset, string currency)
         {
-            var data = new CancelAllOrdersRequest() { major = major, minor = minor };
+            var data = new CancelAllOrdersRequest() { asset = asset, currency = currency };
             var result = Call(Method.POST, "/v1/order/cancel/all", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
             return obj.success;

@@ -2,27 +2,39 @@
 
 namespace Quantum
 {
-    public class TradeOrder{
+    public class OrderBookItem{
+        public string id;
+        public decimal amount;
+        public decimal filled;
+        public decimal price;
+    }
+
+    public class OpenOrderItem
+    {
         public string id;
         public string action;
         public decimal amount;
         public decimal filled;
-        public string asset;
-        public string currency;
         public decimal price;
-        public string status;
-        public DateTime created_on;
-        public DateTime updated_on;
-        public Int64 sequence;
-
     }
 
+    public class StopLossOrderItem
+    {
+        public string id;
+        public string action;
+        public decimal amount;
+        public decimal filled;
+        public decimal price;
+        public decimal stop_price;
+        public string type;
+    }
+    
     public class GetOrderBookResponse
     {
         public string asset;
         public string currency;
-        public TradeOrder[] asks;
-        public TradeOrder[] bids;
+        public OrderBookItem[] asks;
+        public OrderBookItem[] bids;
         public DateTime timestamp;
     }
 
@@ -38,27 +50,28 @@ namespace Quantum
         public string asset;
         public string currency;
         public decimal price;
+        public decimal stop_price;
         public string type;
+        public string[] options;
     }
 
     public class PlaceOrderResponse
     {
         public string id;
-
     }
 
     public class CanceOrderRequest
     {
         public string id;
-        public string major;
-        public string minor;
+        public string asset;
+        public string currency;
 
     }
 
     public class CancelAllOrdersRequest
     {
-        public string major;
-        public string minor;
+        public string asset;
+        public string currency;
 
     }
 
