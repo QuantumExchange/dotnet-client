@@ -1,5 +1,7 @@
 # .NET client for the Quantum Exchange
 
+[![Build status](https://ci.appveyor.com/api/projects/status/8oefpm8yqbo555js?svg=true)](https://ci.appveyor.com/project/AdemarGonzalez/dotnet-client)
+
 To add a reference to the Nuget package in your project do
 
 ```bash   
