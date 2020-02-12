@@ -117,13 +117,16 @@ namespace Quantum
 
         public string PlaceLimitOrder(string action, decimal amount, string asset, string currency, decimal price, string[] options)
         {
-            var data = new PlaceOrderRequest() { action = action
-                , amount = amount
-                , asset = asset
-                , currency = currency
-                , price = price
-                , type = "limit"
-                , options = options };
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                amount = amount,
+                asset = asset,
+                currency = currency,
+                price = price,
+                type = "limit",
+                options = options
+            };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
 
@@ -137,11 +140,29 @@ namespace Quantum
 
         public string PlaceMarketOrder(string action, decimal amount, string asset, string currency)
         {
-        var data = new PlaceOrderRequest() { action = action
-            , amount = amount
-            , asset = asset
-            , currency = currency
-            , type = "market" };
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                amount = amount,
+                asset = asset,
+                currency = currency,
+                type = "market"
+            };
+            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            return obj.id;
+        }
+
+        public string PlaceQuotedMarketOrder(string action, decimal quote_amount, string asset, string currency)
+        {
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                quote_amount = quote_amount ,
+                asset = asset,
+                currency = currency,
+                type = "market"
+            };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
             return obj.id;
@@ -149,14 +170,16 @@ namespace Quantum
 
         public string PlaceTakeProfitLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price, string[] options)
         {
-            var data = new PlaceOrderRequest() { action = action
-                , amount = amount
-                , asset = asset
-                , currency = currency
-                , price = price
-                , stop_price = stop_price
-                , type = "take-profit-limit"
-                , options = options
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                amount = amount,
+                asset = asset,
+                currency = currency,
+                price = price,
+                stop_price = stop_price,
+                type = "take-profit-limit",
+                options = options
             };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
@@ -171,13 +194,21 @@ namespace Quantum
 
         public string PlaceTakeProfitMarketOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
         {
-            var data = new PlaceOrderRequest() { action = action
-                , amount = amount
-                , asset = asset
-                , currency = currency
-                , price = price
-                , stop_price = stop_price
-                , type = "take-profit-market"
+            var data = new PlaceOrderRequest()
+            {
+                action = action
+                ,
+                amount = amount
+                ,
+                asset = asset
+                ,
+                currency = currency
+                ,
+                price = price
+                ,
+                stop_price = stop_price
+                ,
+                type = "take-profit-market"
             };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
@@ -187,14 +218,16 @@ namespace Quantum
 
         public string PlaceStopLossLimitOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price, string[] options)
         {
-            var data = new PlaceOrderRequest() { action = action
-                , amount = amount
-                , asset = asset
-                , currency = currency
-                , price = price
-                , stop_price = stop_price
-                , type = "stop-loss-limit"
-                , options = options
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                amount = amount,
+                asset = asset,
+                currency = currency,
+                price = price,
+                stop_price = stop_price,
+                type = "stop-loss-limit"
+                ,options = options
             };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
@@ -209,13 +242,15 @@ namespace Quantum
 
         public string PlaceStopLossMarketOrder(string action, decimal amount, string asset, string currency, decimal price, decimal stop_price)
         {
-            var data = new PlaceOrderRequest() { action = action
-                , amount = amount
-                , asset = asset
-                , currency = currency
-                , price = price
-                , type = "stop-loss-market"
-                , stop_price = stop_price
+            var data = new PlaceOrderRequest()
+            {
+                action = action,
+                amount = amount,
+                asset = asset,
+                currency = currency,
+                price = price,
+                type = "stop-loss-market",
+                stop_price = stop_price
             };
             var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
@@ -240,8 +275,9 @@ namespace Quantum
             return obj.success;
         }
 
-        public bool SubmitWithdrawal(decimal amount, string asset) {
-            var data = new WithdrawalRequest() { amount = amount, asset = asset };
+        public bool SubmitWithdrawal(decimal amount, string asset, string address)
+        {
+            var data = new WithdrawalRequest() { amount = amount, asset = asset, address = address };
             var result = Call(Method.POST, "/v1/withdraw", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<WithdrawalResponse>(result.Content);
             return obj.success;

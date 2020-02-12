@@ -47,6 +47,7 @@ namespace Quantum
     {
         public string action;
         public decimal amount;
+        public decimal quote_amount;
         public string asset;
         public string currency;
         public decimal price;
@@ -85,6 +86,7 @@ namespace Quantum
     {
         public decimal amount;
         public string asset;
+        public string address;
     }
 
     public class WithdrawalResponse
