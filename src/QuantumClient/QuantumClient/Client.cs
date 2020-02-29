@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
-using RestSharp;
 
 namespace Quantum
 {
@@ -56,63 +57,78 @@ namespace Quantum
             return (DateTime.UtcNow - epoch).Ticks / 10L;
         }
 
-        private IRestResponse Call(Method method, string endPoint, string data, bool priv)
+        private string Call(string method, string endPoint, string data, bool priv)
         {
-            var client = new RestClient(serverUrl);
-            var request = new RestRequest(endPoint, method);
+            var client = new HttpClient();
+            //var request = new RestRequest(endPoint, method);
+
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var url = serverUrl + endPoint;
 
             if (priv)
             {
-                request.AddHeader("QUANTUM_API_KEY", key);
+                client.DefaultRequestHeaders.Add("QUANTUM_API_KEY", key);
                 var nonce = GetNonce();
-                var signature = HMAC(secret, nonce.ToString() + method.ToString() + endPoint + data);
-                request.AddHeader("QUANTUM_API_SIGNATURE", signature);
-                request.AddHeader("QUANTUM_API_NONCE", nonce.ToString());
-            }
+                var signature = HMAC(secret, nonce.ToString() + method + endPoint + data);
+                client.DefaultRequestHeaders.Add("QUANTUM_API_SIGNATURE", signature);
+                client.DefaultRequestHeaders.Add("QUANTUM_API_NONCE", nonce.ToString());
+            };
 
-            if (!string.IsNullOrEmpty(data))
+            HttpResponseMessage response;
+
+            if (method.Equals("POST"))
             {
-                request.AddParameter("text/json", data, ParameterType.RequestBody);
+                StringContent body = null;
+                if (!string.IsNullOrEmpty(data))
+                {
+                    body = new StringContent(data, Encoding.UTF8, "application/json");
+
+                }
+                response = client.PostAsync(url, body).Result;
             }
-
-            var result = client.Execute(request);
-
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+            else
             {
-                throw new Exception(result.Content);
+                response = client.GetAsync(url).Result;
             }
 
-            return result;
+            if (response.StatusCode == System.Net.HttpStatusCode.OK){
+                return response.Content.ReadAsStringAsync().Result;
+            }
+
+            throw new Exception(response.Content.ReadAsStringAsync().Result);
+
+
         }
 
         public GetOrderBookResponse GetOrderBook(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/order_book/" + asset + "/" + currency, null, false);
-            return JsonConvert.DeserializeObject<GetOrderBookResponse>(result.Content);
+            var result = Call("GET", "/v1/order_book/" + asset + "/" + currency, null, false);
+            return JsonConvert.DeserializeObject<GetOrderBookResponse>(result);
         }
 
         public Balance[] GetBalance()
         {
-            var result = Call(Method.GET, "/v1/balance", null, true);
-            return JsonConvert.DeserializeObject<Balance[]>(result.Content);
+            var result = Call("GET", "/v1/balance", null, true);
+            return JsonConvert.DeserializeObject<Balance[]>(result);
         }
 
         public OpenOrderItem[] GetOpenOrders(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/open", null, true);
-            return JsonConvert.DeserializeObject<OpenOrderItem[]>(result.Content);
+            var result = Call("GET", "/v1/orders/" + asset + "/" + currency + "/open", null, true);
+            return JsonConvert.DeserializeObject<OpenOrderItem[]>(result);
         }
 
         public StopLossOrderItem[] GetTakeProfitOrders(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/take_profit", null, true);
-            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result.Content);
+            var result = Call("GET", "/v1/orders/" + asset + "/" + currency + "/take_profit", null, true);
+            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result);
         }
 
         public StopLossOrderItem[] GetStopLossOrders(string asset, string currency)
         {
-            var result = Call(Method.GET, "/v1/orders/" + asset + "/" + currency + "/stop_loss", null, true);
-            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result.Content);
+            var result = Call("GET", "/v1/orders/" + asset + "/" + currency + "/stop_loss", null, true);
+            return JsonConvert.DeserializeObject<StopLossOrderItem[]>(result);
         }
 
         public string PlaceLimitOrder(string action, decimal amount, string asset, string currency, decimal price, string[] options)
@@ -127,8 +143,8 @@ namespace Quantum
                 type = "limit",
                 options = options
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
 
             return obj.id;
         }
@@ -148,8 +164,8 @@ namespace Quantum
                 currency = currency,
                 type = "market"
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
             return obj.id;
         }
 
@@ -163,8 +179,8 @@ namespace Quantum
                 currency = currency,
                 type = "market"
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
             return obj.id;
         }
 
@@ -181,8 +197,8 @@ namespace Quantum
                 type = "take-profit-limit",
                 options = options
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
 
             return obj.id;
         }
@@ -196,22 +212,16 @@ namespace Quantum
         {
             var data = new PlaceOrderRequest()
             {
-                action = action
-                ,
-                amount = amount
-                ,
+                action = action,
+                amount = amount,
                 asset = asset
-                ,
-                currency = currency
-                ,
-                price = price
-                ,
-                stop_price = stop_price
-                ,
-                type = "take-profit-market"
+                ,currency = currency
+                ,price = price
+                ,stop_price = stop_price
+                ,type = "take-profit-market"
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
 
             return obj.id;
         }
@@ -229,8 +239,8 @@ namespace Quantum
                 type = "stop-loss-limit"
                 ,options = options
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
 
             return obj.id;
         }
@@ -252,8 +262,8 @@ namespace Quantum
                 type = "stop-loss-market",
                 stop_price = stop_price
             };
-            var result = Call(Method.POST, "/v1/order/new", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
 
             return obj.id;
         }
@@ -261,8 +271,8 @@ namespace Quantum
         public bool CancelOrder(string orderId, string asset, string currency)
         {
             var data = new CanceOrderRequest() { id = orderId, asset = asset, currency = currency };
-            var result = Call(Method.POST, "/v1/order/cancel", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/cancel", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result);
 
             return obj.success;
         }
@@ -270,16 +280,16 @@ namespace Quantum
         public bool CancelAllOrders(string asset, string currency)
         {
             var data = new CancelAllOrdersRequest() { asset = asset, currency = currency };
-            var result = Call(Method.POST, "/v1/order/cancel/all", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result.Content);
+            var result = Call("POST", "/v1/order/cancel/all", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<CancelOrderResponse>(result);
             return obj.success;
         }
 
         public bool SubmitWithdrawal(decimal amount, string asset, string address)
         {
             var data = new WithdrawalRequest() { amount = amount, asset = asset, address = address };
-            var result = Call(Method.POST, "/v1/withdraw", JsonConvert.SerializeObject(data), true);
-            var obj = JsonConvert.DeserializeObject<WithdrawalResponse>(result.Content);
+            var result = Call("POST", "/v1/withdraw", JsonConvert.SerializeObject(data), true);
+            var obj = JsonConvert.DeserializeObject<WithdrawalResponse>(result);
             return obj.success;
         }
 
