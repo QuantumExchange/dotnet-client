@@ -10,7 +10,7 @@
     <PackageTags>cryptocurrency trading</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageId>QuantumClient</PackageId>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
   </PropertyGroup>
 
   <ItemGroup>
