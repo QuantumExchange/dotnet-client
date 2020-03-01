@@ -14,6 +14,8 @@ namespace Quantum
         string key;
         string secret;
 
+        HttpClient client = new HttpClient();
+
         public Client() { }
 
         public Client(string serverUrl, string key, string secret)
@@ -59,45 +61,37 @@ namespace Quantum
 
         private string Call(string method, string endPoint, string data, bool priv)
         {
-            var client = new HttpClient();
-            //var request = new RestRequest(endPoint, method);
-
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var url = serverUrl + endPoint;
-
+            HttpRequestMessage requestMessage = new HttpRequestMessage();
+            requestMessage.RequestUri = new Uri(serverUrl + endPoint);
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             if (priv)
             {
-                client.DefaultRequestHeaders.Add("QUANTUM_API_KEY", key);
+                requestMessage.Headers.Add("QUANTUM_API_KEY", key);
                 var nonce = GetNonce();
                 var signature = HMAC(secret, nonce.ToString() + method + endPoint + data);
-                client.DefaultRequestHeaders.Add("QUANTUM_API_SIGNATURE", signature);
-                client.DefaultRequestHeaders.Add("QUANTUM_API_NONCE", nonce.ToString());
+                requestMessage.Headers.Add("QUANTUM_API_SIGNATURE", signature);
+                requestMessage.Headers.Add("QUANTUM_API_NONCE", nonce.ToString());
             };
 
             HttpResponseMessage response;
 
             if (method.Equals("POST"))
             {
-                StringContent body = null;
                 if (!string.IsNullOrEmpty(data))
                 {
-                    body = new StringContent(data, Encoding.UTF8, "application/json");
+                    requestMessage.Content = new StringContent(data, Encoding.UTF8, "application/json");
 
                 }
-                response = client.PostAsync(url, body).Result;
-            }
-            else
-            {
-                response = client.GetAsync(url).Result;
             }
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK){
+            response = client.SendAsync(requestMessage).Result;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
                 return response.Content.ReadAsStringAsync().Result;
             }
 
             throw new Exception(response.Content.ReadAsStringAsync().Result);
-
 
         }
 
@@ -174,7 +168,7 @@ namespace Quantum
             var data = new PlaceOrderRequest()
             {
                 action = action,
-                quote_amount = quote_amount ,
+                quote_amount = quote_amount,
                 asset = asset,
                 currency = currency,
                 type = "market"
@@ -215,10 +209,14 @@ namespace Quantum
                 action = action,
                 amount = amount,
                 asset = asset
-                ,currency = currency
-                ,price = price
-                ,stop_price = stop_price
-                ,type = "take-profit-market"
+                ,
+                currency = currency
+                ,
+                price = price
+                ,
+                stop_price = stop_price
+                ,
+                type = "take-profit-market"
             };
             var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
@@ -237,7 +235,8 @@ namespace Quantum
                 price = price,
                 stop_price = stop_price,
                 type = "stop-loss-limit"
-                ,options = options
+                ,
+                options = options
             };
             var result = Call("POST", "/v1/order/new", JsonConvert.SerializeObject(data), true);
             var obj = JsonConvert.DeserializeObject<PlaceOrderResponse>(result);
