@@ -77,10 +77,11 @@ namespace Quantum
 
             if (method.Equals("POST"))
             {
+                requestMessage.Method = HttpMethod.Post;
+
                 if (!string.IsNullOrEmpty(data))
                 {
                     requestMessage.Content = new StringContent(data, Encoding.UTF8, "application/json");
-
                 }
             }
 
